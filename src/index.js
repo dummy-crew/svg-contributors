@@ -7,6 +7,7 @@ function getRepoContributors(owner, repo) {
     .request("GET /repos/{owner}/{repo}/contributors  ", {
       owner,
       repo,
+      per_page: 100,
     })
     .then((res) => {
       const contributors = res.data.map((user) => {
