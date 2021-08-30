@@ -1,7 +1,7 @@
 {
   "name": "svg-contributors",
   "version": "1.0.0",
-  "description": "Generate svg from repo contributors",
+  "description": "Generate contributors svg from github repository",
   "main": "src/index.js",
   "files": [
     "bin/",
