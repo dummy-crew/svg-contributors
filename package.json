@@ -17,7 +17,23 @@
     "octokit": "^1.4.0",
     "request": "^2.88.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "prettier": "^2.3.2"
+  },
+  "scripts": {
+    "format": "prettier --write \"src/**/*.js\"",
+    "lint": "eslint src/**",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dummy-crew/svg-contributors.git"
@@ -28,8 +44,8 @@
     "zero-configuation",
     "build-tools"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "reliut-g",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/dummy-crew/svg-contributors/issues"
   },

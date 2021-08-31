@@ -1,5 +1,5 @@
-const fs = require("fs");
-const { Octokit } = require("octokit");
+const fs = require('fs');
+const { Octokit } = require('octokit');
 const octokit = new Octokit();
 
 function getRepoContributors(owner, repo) {
@@ -18,13 +18,13 @@ function getRepoContributors(owner, repo) {
         };
       });
       if (!Array.isArray(contributors)) {
-        console.log("Error: ", contributors.message);
+        console.log('Error: ', contributors.message);
         return [];
       }
       return contributors;
     })
     .catch((err) => {
-      console.log("Error: ", err.message);
+      console.log('Error: ', err.message);
       return [];
     });
   return data;
@@ -39,7 +39,7 @@ function generateSvg(contributors) {
             </clipPath>
             `;
 
-  console.log("Generating SVG...");
+  console.log('Generating SVG...');
 
   const parsed = Promise.all(
     contributors.map(async (user) => {
@@ -52,7 +52,7 @@ function generateSvg(contributors) {
         </a>
       </svg>
         `;
-    })
+    }),
   ).then((svgList) => {
     const distance = 68;
 
@@ -74,7 +74,7 @@ function generateSvg(contributors) {
       nextX = x * distance;
       nextY = y * distance;
 
-      svg += userSvg.replace("nextX", nextX).replace("nextY", nextY);
+      svg += userSvg.replace('nextX', nextX).replace('nextY', nextY);
 
       x++;
     });
@@ -86,30 +86,27 @@ function generateSvg(contributors) {
 }
 
 function downloadSvg(svg) {
-  const minified = svg.replace(/\s+/g, " ");
-  fs.writeFile("contributors.svg", minified, (err) => {
+  const minified = svg.replace(/\s+/g, ' ');
+  fs.writeFile('contributors.svg', minified, (err) => {
     if (err) throw err;
-    console.log("The file has been saved!");
+    console.log('The file has been saved!');
   });
 }
 
 function convertImageToDataURI(url) {
   return new Promise((resolve, reject) => {
-    const request = require("request");
+    const request = require('request');
     request.get(url, { encoding: null }, (err, res, body) => {
       if (err) {
-        console.log("Error: ", err.message);
+        console.log('Error: ', err.message);
         reject(err);
       }
       // compress image
-      const jimp = require("jimp");
+      const jimp = require('jimp');
       jimp
         .read(body)
         .then((image) => {
-          return image
-            .resize(100, 100)
-            .quality(50)
-            .getBase64Async(jimp.MIME_PNG);
+          return image.resize(100, 100).quality(50).getBase64Async(jimp.MIME_PNG);
         })
         .then((dataURI) => {
           resolve(dataURI);
