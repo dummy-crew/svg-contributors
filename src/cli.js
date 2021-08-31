@@ -38,8 +38,9 @@ function cli(args) {
       console.log("No contributors found");
       return;
     }
-    const svg = generateSvg(contributors);
-    downloadSvg(svg);
+    generateSvg(contributors).then((svg) => {
+      downloadSvg(svg);
+    });
   });
 }
 
