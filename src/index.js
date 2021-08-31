@@ -3,8 +3,9 @@ const { Octokit } = require("octokit");
 const octokit = new Octokit();
 
 function getRepoContributors(owner, repo) {
-  const data = octokit
-    .request("GET /repos/{owner}/{repo}/contributors  ", {
+  // Lists contributors to the specified repository and sorts them by the number of commits per contributor in descending order.
+  const data = octokit.rest.repos
+    .listContributors({
       owner,
       repo,
       per_page: 100,
@@ -30,7 +31,7 @@ function getRepoContributors(owner, repo) {
 }
 
 function generateSvg(contributors) {
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev/svgjs" width="812" height="472">`;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="812" height="472">`;
 
   // for round corner
   svg += `<clipPath id="clip" clipPathUnits="objectBoundingBox">
