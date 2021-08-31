@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "arg": "^5.0.1",
-    "octokit": "^1.4.0"
+    "jimp": "^0.16.1",
+    "octokit": "^1.4.0",
+    "request": "^2.88.2"
   },
   "devDependencies": {},
   "repository": {

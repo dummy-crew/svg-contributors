@@ -19,5 +19,5 @@ dummysvg -o vuejs -n vue
 
 ## Output
 <p align="center">
-    <img src="./contributors.svg" alt="Vue logo">
+    <img src="./contributors.svg" alt="Contributors">
 <p>
