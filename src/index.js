@@ -31,7 +31,7 @@ function getRepoContributors(owner, repo) {
 }
 
 function generateSvg(contributors) {
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="812" height="472">`;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="auto">`;
 
   // for round corner
   svg += `<clipPath id="clip" clipPathUnits="objectBoundingBox">
@@ -39,30 +39,35 @@ function generateSvg(contributors) {
             </clipPath>
             `;
 
-  let distanceX = 68;
-  let distanceY = 0;
-  let index = 0;
-  let line = 0;
+  const distance = 68;
+
+  let x = 0;
+  let y = 0;
+
+  let nextX = x * distance;
+  let nextY = y * distance;
+
+  let maxX = 9; // max number of contributors in a row, add 1, so max it's 10
 
   contributors.forEach((user) => {
-    let nextX = index * distanceX;
-    if (nextX / 11 === 68) {
-      line++;
-      index = -1;
-      // create new line
-      if (line >= 2) {
-        distanceY += 68;
-      }
+    // end of row
+    if (nextX / maxX === distance) {
+      x = 0;
+      y++;
     }
+
+    nextX = x * distance;
+    nextY = y * distance;
+
     svg += `
-          <svg x="${nextX}" y="${distanceY}">
+          <svg x="${nextX}" y="${nextY}">
             <a href="https://github.com/${user.name}" target="_blank">
                 <title>${user.name}</title>
               <image href="${user.avatar_url}" height="64" width="64"  clip-path="url(#clip)" />
             </a>
           </svg>
             `;
-    index++;
+    x++;
   });
   svg += `</svg>`;
 
