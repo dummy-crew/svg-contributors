@@ -31,8 +31,10 @@ function getRepoContributors(owner, repo) {
 }
 
 function generateSvg(contributors) {
-  let svg =
-    '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="990">';
+  const width = 64 * 11;
+  const heigh = 70 * Math.round(contributors.length / 10) + 1;
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${heigh}">`;
 
   // for round corner
   svg += `<clipPath id="clip" clipPathUnits="objectBoundingBox">
@@ -63,7 +65,7 @@ function generateSvg(contributors) {
     let nextX = x * distance;
     let nextY = y * distance;
 
-    const maxX = 9; // max number of contributors in a row, add 1, so max it's 10
+    const maxX = 9; // max number of contributors per row
 
     svgList.forEach((userSvg) => {
       // end of row
