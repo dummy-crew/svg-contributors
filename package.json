@@ -1,6 +1,6 @@
 {
   "name": "svg-contributors",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Generate contributors svg from github repository",
   "main": "src/index.js",
   "files": [
