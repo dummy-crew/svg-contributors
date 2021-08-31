@@ -31,7 +31,7 @@ function getRepoContributors(owner, repo) {
 }
 
 function generateSvg(contributors) {
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="auto">`;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="990">`;
 
   // for round corner
   svg += `<clipPath id="clip" clipPathUnits="objectBoundingBox">
@@ -39,39 +39,50 @@ function generateSvg(contributors) {
             </clipPath>
             `;
 
-  const distance = 68;
+  console.log("Generating SVG...");
 
-  let x = 0;
-  let y = 0;
+  const parsed = Promise.all(
+    contributors.map(async (user) => {
+      const dataURI = await convertImageToDataURI(user.avatar_url);
+      return `
+      <svg x="nextX" y="nextY">
+        <a href="https://github.com/${user.name}" target="_blank">
+            <title>${user.name}</title>
+          <image href="${dataURI}" height="64" width="64"  clip-path="url(#clip)" />
+        </a>
+      </svg>
+        `;
+    })
+  ).then((svgList) => {
+    const distance = 68;
 
-  let nextX = x * distance;
-  let nextY = y * distance;
+    let x = 0;
+    let y = 0;
 
-  let maxX = 9; // max number of contributors in a row, add 1, so max it's 10
+    let nextX = x * distance;
+    let nextY = y * distance;
 
-  contributors.forEach((user) => {
-    // end of row
-    if (nextX / maxX === distance) {
-      x = 0;
-      y++;
-    }
+    let maxX = 9; // max number of contributors in a row, add 1, so max it's 10
 
-    nextX = x * distance;
-    nextY = y * distance;
+    svgList.forEach((userSvg) => {
+      // end of row
+      if (nextX / maxX === distance) {
+        x = 0;
+        y++;
+      }
 
-    svg += `
-          <svg x="${nextX}" y="${nextY}">
-            <a href="https://github.com/${user.name}" target="_blank">
-                <title>${user.name}</title>
-              <image href="${user.avatar_url}" height="64" width="64"  clip-path="url(#clip)" />
-            </a>
-          </svg>
-            `;
-    x++;
+      nextX = x * distance;
+      nextY = y * distance;
+
+      svg += userSvg.replace("nextX", nextX).replace("nextY", nextY);
+
+      x++;
+    });
+    svg += `</svg>`;
+    return svg;
   });
-  svg += `</svg>`;
 
-  return svg;
+  return parsed;
 }
 
 function downloadSvg(svg) {
@@ -79,6 +90,31 @@ function downloadSvg(svg) {
   fs.writeFile("contributors.svg", minified, (err) => {
     if (err) throw err;
     console.log("The file has been saved!");
+  });
+}
+
+function convertImageToDataURI(url) {
+  return new Promise((resolve, reject) => {
+    const request = require("request");
+    request.get(url, { encoding: null }, (err, res, body) => {
+      if (err) {
+        console.log("Error: ", err.message);
+        reject(err);
+      }
+      // compress image
+      const jimp = require("jimp");
+      jimp
+        .read(body)
+        .then((image) => {
+          return image
+            .resize(100, 100)
+            .quality(50)
+            .getBase64Async(jimp.MIME_PNG);
+        })
+        .then((dataURI) => {
+          resolve(dataURI);
+        });
+    });
   });
 }
 
