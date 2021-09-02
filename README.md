@@ -2,6 +2,12 @@
 
 Generate contributors svg from github repository
 
+## Installation
+
+```bash
+npm i svg-contributors -g
+```
+
 ## Usage
 
 ```bash
