@@ -6,10 +6,10 @@ function parseArgumentsIntoOptions(rawArgs) {
     {
       '--owner': String,
       '--name': String,
-      '--token': String,
+      '--limit': String,
       '-o': '--owner',
       '-n': '--name',
-      '-t': '--token',
+      '-l': '--limit',
     },
     {
       argv: rawArgs.slice(2),
@@ -18,7 +18,7 @@ function parseArgumentsIntoOptions(rawArgs) {
   return {
     repoOwner: args['--owner'],
     repoName: args['--name'],
-    token: args['--token'],
+    limit: args['--limit'],
   };
 }
 
@@ -29,7 +29,7 @@ function cli(args) {
     console.log('Please provide a repo owner and repo name');
     return;
   }
-  getRepoContributors(parsedArgs.repoOwner, parsedArgs.repoName, parsedArgs.token).then((contributors) => {
+  getRepoContributors(parsedArgs.repoOwner, parsedArgs.repoName, parsedArgs.limit).then((contributors) => {
     if (contributors.length === 0) {
       console.log('No contributors found');
       return;

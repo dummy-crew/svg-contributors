@@ -2,13 +2,13 @@ const fs = require('fs');
 const { Octokit } = require('octokit');
 const octokit = new Octokit();
 
-function getRepoContributors(owner, repo) {
+function getRepoContributors(owner, repo, limit = 30) {
   // Lists contributors to the specified repository and sorts them by the number of commits per contributor in descending order.
   const data = octokit.rest.repos
     .listContributors({
       owner,
       repo,
-      per_page: 100,
+      per_page: limit,
     })
     .then((res) => {
       const contributors = res.data.map((user) => {
