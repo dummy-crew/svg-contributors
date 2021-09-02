@@ -14,7 +14,7 @@ function getRepoContributors(owner, repo, limit = 30) {
       const contributors = res.data.map((user) => {
         return {
           name: user.login,
-          avatar_url: user.avatar_url,
+          avatar_url: `https://avatars.githubusercontent.com/u/${user.id}?s=100&amp;v=4`,
         };
       });
       if (!Array.isArray(contributors)) {
@@ -104,16 +104,8 @@ function convertImageToDataURI(url) {
         console.log('Error: ', err.message);
         reject(err);
       }
-      // compress image
-      const jimp = require('jimp');
-      jimp
-        .read(body)
-        .then((image) => {
-          return image.resize(100, 100).quality(50).getBase64Async(jimp.MIME_PNG);
-        })
-        .then((dataURI) => {
-          resolve(dataURI);
-        });
+      const dataURI = `data:image/png;base64,${body.toString('base64')}`;
+      resolve(dataURI);
     });
   });
 }

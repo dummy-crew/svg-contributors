@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "arg": "^5.0.1",
-    "jimp": "^0.16.1",
     "octokit": "^1.4.0",
     "request": "^2.88.2"
   },
