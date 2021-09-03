@@ -64,9 +64,9 @@ function generateSvg(contributors) {
     const width = COLS_PER_ROW * IMG_WIDTH + (COLS_PER_ROW + 1) * MARGIN;
     const height = rows * IMG_HEIGHT + (rows + 1) * MARGIN;
 
-    svgList.forEach((userSvg) => {
-      const nextX = (svgList.indexOf(userSvg) % COLS_PER_ROW) * (IMG_WIDTH + MARGIN);
-      const nextY = Math.floor(svgList.indexOf(userSvg) / COLS_PER_ROW) * (IMG_HEIGHT + MARGIN);
+    svgList.forEach((userSvg, index) => {
+      const nextX = (index % COLS_PER_ROW) * (IMG_WIDTH + MARGIN);
+      const nextY = Math.floor(index / COLS_PER_ROW) * (IMG_HEIGHT + MARGIN);
       svg += userSvg.replace('nextX', nextX).replace('nextY', nextY);
     });
 
