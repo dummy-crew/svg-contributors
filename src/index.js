@@ -31,10 +31,13 @@ function getRepoContributors(owner, repo, limit = 30) {
 }
 
 function generateSvg(contributors) {
-  const width = 64 * 11;
-  const heigh = 70 * Math.round(contributors.length / 10) + 1;
+  const COLS_PER_ROW = 10;
+  const IMG_WIDTH = 60;
+  const IMG_HEIGHT = 60;
+  const MARGIN = 7.5;
 
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${heigh}">`;
+  let svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="{{width}}" height="{{heigh}}">';
 
   // for round corner
   svg += `<clipPath id="clip" clipPathUnits="objectBoundingBox">
@@ -57,31 +60,19 @@ function generateSvg(contributors) {
         `;
     }),
   ).then((svgList) => {
-    const distance = 68;
-
-    let x = 0;
-    let y = 0;
-
-    let nextX = x * distance;
-    let nextY = y * distance;
-
-    const maxX = 9; // max number of contributors per row
+    const rows = Math.ceil(contributors.length / COLS_PER_ROW);
+    const width = COLS_PER_ROW * IMG_WIDTH + (COLS_PER_ROW + 1) * MARGIN;
+    const height = rows * IMG_HEIGHT + (rows + 1) * MARGIN;
 
     svgList.forEach((userSvg) => {
-      // end of row
-      if (nextX / maxX === distance) {
-        x = 0;
-        y++;
-      }
-
-      nextX = x * distance;
-      nextY = y * distance;
-
+      const nextX = (svgList.indexOf(userSvg) % COLS_PER_ROW) * (IMG_WIDTH + MARGIN);
+      const nextY = Math.floor(svgList.indexOf(userSvg) / COLS_PER_ROW) * (IMG_HEIGHT + MARGIN);
       svg += userSvg.replace('nextX', nextX).replace('nextY', nextY);
-
-      x++;
     });
+
+    svg = svg.replace('{{width}}', width).replace('{{heigh}}', height);
     svg += '</svg>';
+
     return svg;
   });
 
