@@ -34,7 +34,7 @@ function generateSvg(contributors) {
   const COLS_PER_ROW = 10;
   const IMG_WIDTH = 60;
   const IMG_HEIGHT = 60;
-  const MARGIN = 7.5;
+  const MARGIN = 10;
 
   let svg =
     '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="{{width}}" height="{{heigh}}">';
