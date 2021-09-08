@@ -14,7 +14,7 @@ function getRepoContributors(owner, repo, limit = 30) {
       const contributors = res.data.map((user) => {
         return {
           name: user.login,
-          avatar_url: `https://avatars.githubusercontent.com/u/${user.id}?s=100&amp;v=4`,
+          avatar_url: `https://avatars.githubusercontent.com/u/${user.id}?s=60&v=4`,
         };
       });
       if (!Array.isArray(contributors)) {
@@ -30,10 +30,10 @@ function getRepoContributors(owner, repo, limit = 30) {
   return data;
 }
 
-function generateSvg(contributors) {
+function generateSvg(contributors, avatarSize = 60) {
   const COLS_PER_ROW = 10;
-  const IMG_WIDTH = 60;
-  const IMG_HEIGHT = 60;
+  const IMG_WIDTH = avatarSize > 460 ? 460 : avatarSize;
+  const IMG_HEIGHT = avatarSize > 460 ? 460 : avatarSize;
   const MARGIN = 10;
 
   let svg =
@@ -49,12 +49,12 @@ function generateSvg(contributors) {
 
   const parsed = Promise.all(
     contributors.map(async (user) => {
-      const dataURI = await convertImageToDataURI(user.avatar_url);
+      const dataURI = await convertImageToDataURI(user.avatar_url, avatarSize);
       return `
       <svg x="nextX" y="nextY">
         <a href="https://github.com/${user.name}" target="_blank">
             <title>${user.name}</title>
-          <image href="${dataURI}" height="64" width="64"  clip-path="url(#clip)" />
+          <image href="${dataURI}" height="${IMG_HEIGHT}" width="${IMG_WIDTH}"  clip-path="url(#clip)" />
         </a>
       </svg>
         `;
@@ -87,10 +87,10 @@ function downloadSvg(svg) {
   });
 }
 
-function convertImageToDataURI(url) {
+function convertImageToDataURI(url, avatarSize) {
   return new Promise((resolve, reject) => {
     const request = require('request');
-    request.get(url, { encoding: null }, (err, res, body) => {
+    request.get(url.replace(/\?s=\d+/, `?s=${avatarSize}`), { encoding: null }, (err, res, body) => {
       if (err) {
         console.log('Error: ', err.message);
         reject(err);

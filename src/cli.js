@@ -20,6 +20,7 @@ function parseArgumentsIntoOptions(rawArgs) {
   return {
     repoOwner: args['--owner'],
     repoName: args['--name'],
+    avatarSize: args['--size'],
     limit: args['--limit'],
   };
 }
@@ -36,7 +37,7 @@ function cli(args) {
       console.log('No contributors found');
       return;
     }
-    generateSvg(contributors).then((svg) => {
+    generateSvg(contributors, parsedArgs.avatarSize).then((svg) => {
       downloadSvg(svg);
     });
   });
