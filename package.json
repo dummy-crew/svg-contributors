@@ -8,8 +8,8 @@
     "src/**/*"
   ],
   "bin": {
-    "@dummy-crew/svg-contributors": "bin/contributors",
-    "dummysvg": "bin/contributors"
+    "@dummy-crew/svg-contributors": "./bin/contributors",
+    "dummysvg": "./bin/contributors"
   },
   "dependencies": {
     "arg": "^5.0.1",
