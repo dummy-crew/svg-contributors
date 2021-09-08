@@ -8,11 +8,10 @@ Generate contributors svg from github repository
 npm i svg-contributors -g
 ```
 
-## Usage
+## Example
 
 ```bash
 dummysvg -o vuejs -n vue
-
 # output: contributors.svg
 ```
 
@@ -21,7 +20,24 @@ dummysvg -o vuejs -n vue
 ```
 -o, --owner Repository owner
 -n, --name Repository name
+-s, --size Size of the avatar
+-l, --limit Limit of the contributors
 ```
+
+## Configuration
+`owner`
+- Type: string
+
+`name`
+- Type: string
+
+`size`
+- Default: 60
+- Type: number
+
+`limit`
+- Default: 30
+- Type: number
 
 ## Output
 <p align="center">
