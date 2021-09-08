@@ -6,9 +6,11 @@ function parseArgumentsIntoOptions(rawArgs) {
     {
       '--owner': String,
       '--name': String,
+      '--size': Number,
       '--limit': String,
       '-o': '--owner',
       '-n': '--name',
+      '-s': '--size',
       '-l': '--limit',
     },
     {
