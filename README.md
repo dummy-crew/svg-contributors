@@ -1,6 +1,6 @@
 # svg-contributors
 
-Generate contributors svg from github repository
+Generate contributors svg from github repository using cli
 
 ## Installation
 
