@@ -2,14 +2,50 @@ const fs = require('fs');
 const { Octokit } = require('octokit');
 const octokit = new Octokit();
 
+const OCTOKIT_PAGE_LIMIT = 100;
+
 function getRepoContributors(owner, repo, limit = 30) {
   // Lists contributors to the specified repository and sorts them by the number of commits per contributor in descending order.
-  const data = octokit.rest.repos
-    .listContributors({
+  const data = Promise.all(paginateContributors(owner, repo, limit)).then((data) => {
+    return data.flat();
+  });
+
+  return data;
+}
+
+function paginateContributors(owner, repo, pageLimit) {
+  const tailPageLimit = pageLimit % OCTOKIT_PAGE_LIMIT;
+  const fullPages = pageLimit - tailPageLimit;
+  const lastPage = fullPages / OCTOKIT_PAGE_LIMIT + 1;
+  const requests = [];
+
+  for (let i = OCTOKIT_PAGE_LIMIT; i <= fullPages; i += OCTOKIT_PAGE_LIMIT) {
+    const response = octokit.rest.repos.listContributors({
       owner,
       repo,
-      per_page: limit,
-    })
+      per_page: OCTOKIT_PAGE_LIMIT,
+      page: i / OCTOKIT_PAGE_LIMIT,
+    });
+    const chainedResponse = handleResponse(response);
+    requests.push(chainedResponse);
+  }
+  if (tailPageLimit !== 0) {
+    const tailResponse = handleResponse(octokit.rest.repos.listContributors({
+      owner,
+      repo,
+      per_page: OCTOKIT_PAGE_LIMIT,
+      page: lastPage,
+    })).then((res) => {
+      return res.slice(0, tailPageLimit)
+    });
+
+    requests.push(tailResponse);
+  }
+  return requests;
+}
+
+function handleResponse(requestPromise) {
+  return requestPromise
     .then((res) => {
       const contributors = res.data.map((user) => {
         return {
@@ -27,7 +63,6 @@ function getRepoContributors(owner, repo, limit = 30) {
       console.log('Error: ', err.message);
       return [];
     });
-  return data;
 }
 
 function generateSvg(contributors, avatarSize = 60) {
