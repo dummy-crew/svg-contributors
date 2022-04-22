@@ -4,10 +4,16 @@ const octokit = new Octokit();
 
 const OCTOKIT_PAGE_LIMIT = 100;
 
-function getRepoContributors(owner, repo, limit = 30) {
+function getRepoContributors(owner, repo, limit = 30, includeBots = false) {
   // Lists contributors to the specified repository and sorts them by the number of commits per contributor in descending order.
   const data = Promise.all(paginateContributors(owner, repo, limit)).then((data) => {
-    return data.flat();
+    const flatData = data.flat();
+    if (!includeBots) {
+      return flatData.filter((contributor) => {
+        return !(contributor.name.endsWith('[bot]') || contributor.name.endsWith('-bot'));
+      });
+    }
+    return flatData;
   });
 
   return data;
@@ -30,13 +36,15 @@ function paginateContributors(owner, repo, pageLimit) {
     requests.push(chainedResponse);
   }
   if (tailPageLimit !== 0) {
-    const tailResponse = handleResponse(octokit.rest.repos.listContributors({
-      owner,
-      repo,
-      per_page: OCTOKIT_PAGE_LIMIT,
-      page: lastPage,
-    })).then((res) => {
-      return res.slice(0, tailPageLimit)
+    const tailResponse = handleResponse(
+      octokit.rest.repos.listContributors({
+        owner,
+        repo,
+        per_page: OCTOKIT_PAGE_LIMIT,
+        page: lastPage,
+      }),
+    ).then((res) => {
+      return res.slice(0, tailPageLimit);
     });
 
     requests.push(tailResponse);

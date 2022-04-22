@@ -9,11 +9,13 @@ function parseArgumentsIntoOptions(rawArgs) {
       '--size': Number,
       '--limit': Number,
       '--columns': Number,
+      '--include-bots': Boolean,
       '-o': '--owner',
       '-n': '--name',
       '-s': '--size',
       '-l': '--limit',
-      '-c': '--columns'
+      '-c': '--columns',
+      '-b': '--include-bots'
     },
     {
       argv: rawArgs.slice(2),
@@ -25,6 +27,7 @@ function parseArgumentsIntoOptions(rawArgs) {
     avatarSize: args['--size'],
     limit: args['--limit'],
     columns: args['--columns'],
+    includeBots: args['--include-bots']
   };
 }
 
@@ -35,7 +38,7 @@ function cli(args) {
     console.log('Please provide a repo owner and repo name');
     return;
   }
-  getRepoContributors(parsedArgs.repoOwner, parsedArgs.repoName, parsedArgs.limit).then((contributors) => {
+  getRepoContributors(parsedArgs.repoOwner, parsedArgs.repoName, parsedArgs.limit, parsedArgs.includeBots).then((contributors) => {
     if (contributors.length === 0) {
       console.log('No contributors found');
       return;
