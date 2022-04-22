@@ -65,8 +65,7 @@ function handleResponse(requestPromise) {
     });
 }
 
-function generateSvg(contributors, avatarSize = 60) {
-  const COLS_PER_ROW = 10;
+function generateSvg(contributors, avatarSize = 60, columns = 10) {
   const IMG_WIDTH = avatarSize > 460 ? 460 : avatarSize;
   const IMG_HEIGHT = avatarSize > 460 ? 460 : avatarSize;
   const MARGIN = 10;
@@ -95,13 +94,13 @@ function generateSvg(contributors, avatarSize = 60) {
         `;
     }),
   ).then((svgList) => {
-    const rows = Math.ceil(contributors.length / COLS_PER_ROW);
-    const width = COLS_PER_ROW * IMG_WIDTH + (COLS_PER_ROW + 1) * MARGIN;
+    const rows = Math.ceil(contributors.length / columns);
+    const width = columns * IMG_WIDTH + (columns + 1) * MARGIN;
     const height = rows * IMG_HEIGHT + (rows + 1) * MARGIN;
 
     svgList.forEach((userSvg, index) => {
-      const nextX = (index % COLS_PER_ROW) * (IMG_WIDTH + MARGIN);
-      const nextY = Math.floor(index / COLS_PER_ROW) * (IMG_HEIGHT + MARGIN);
+      const nextX = (index % columns) * (IMG_WIDTH + MARGIN);
+      const nextY = Math.floor(index / columns) * (IMG_HEIGHT + MARGIN);
       svg += userSvg.replace('nextX', nextX).replace('nextY', nextY);
     });
 

@@ -8,10 +8,12 @@ function parseArgumentsIntoOptions(rawArgs) {
       '--name': String,
       '--size': Number,
       '--limit': Number,
+      '--columns': Number,
       '-o': '--owner',
       '-n': '--name',
       '-s': '--size',
       '-l': '--limit',
+      '-c': '--columns'
     },
     {
       argv: rawArgs.slice(2),
@@ -22,6 +24,7 @@ function parseArgumentsIntoOptions(rawArgs) {
     repoName: args['--name'],
     avatarSize: args['--size'],
     limit: args['--limit'],
+    columns: args['--columns'],
   };
 }
 
@@ -37,7 +40,7 @@ function cli(args) {
       console.log('No contributors found');
       return;
     }
-    generateSvg(contributors, parsedArgs.avatarSize).then((svg) => {
+    generateSvg(contributors, parsedArgs.avatarSize, parsedArgs.columns).then((svg) => {
       downloadSvg(svg);
     });
   });
