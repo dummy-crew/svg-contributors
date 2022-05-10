@@ -2,14 +2,58 @@ const fs = require('fs');
 const { Octokit } = require('octokit');
 const octokit = new Octokit();
 
-function getRepoContributors(owner, repo, limit = 30) {
+const OCTOKIT_PAGE_LIMIT = 100;
+
+function getRepoContributors(owner, repo, limit = 30, includeBots = false) {
   // Lists contributors to the specified repository and sorts them by the number of commits per contributor in descending order.
-  const data = octokit.rest.repos
-    .listContributors({
+  const data = Promise.all(paginateContributors(owner, repo, limit)).then((data) => {
+    const flatData = data.flat();
+    if (!includeBots) {
+      return flatData.filter((contributor) => {
+        return !(contributor.name.endsWith('[bot]') || contributor.name.endsWith('-bot'));
+      });
+    }
+    return flatData;
+  });
+
+  return data;
+}
+
+function paginateContributors(owner, repo, pageLimit) {
+  const tailPageLimit = pageLimit % OCTOKIT_PAGE_LIMIT;
+  const fullPages = pageLimit - tailPageLimit;
+  const lastPage = fullPages / OCTOKIT_PAGE_LIMIT + 1;
+  const requests = [];
+
+  for (let i = OCTOKIT_PAGE_LIMIT; i <= fullPages; i += OCTOKIT_PAGE_LIMIT) {
+    const response = octokit.rest.repos.listContributors({
       owner,
       repo,
-      per_page: limit,
-    })
+      per_page: OCTOKIT_PAGE_LIMIT,
+      page: i / OCTOKIT_PAGE_LIMIT,
+    });
+    const chainedResponse = handleResponse(response);
+    requests.push(chainedResponse);
+  }
+  if (tailPageLimit !== 0) {
+    const tailResponse = handleResponse(
+      octokit.rest.repos.listContributors({
+        owner,
+        repo,
+        per_page: OCTOKIT_PAGE_LIMIT,
+        page: lastPage,
+      }),
+    ).then((res) => {
+      return res.slice(0, tailPageLimit);
+    });
+
+    requests.push(tailResponse);
+  }
+  return requests;
+}
+
+function handleResponse(requestPromise) {
+  return requestPromise
     .then((res) => {
       const contributors = res.data.map((user) => {
         return {
@@ -27,11 +71,9 @@ function getRepoContributors(owner, repo, limit = 30) {
       console.log('Error: ', err.message);
       return [];
     });
-  return data;
 }
 
-function generateSvg(contributors, avatarSize = 60) {
-  const COLS_PER_ROW = 10;
+function generateSvg(contributors, avatarSize = 60, columns = 10) {
   const IMG_WIDTH = avatarSize > 460 ? 460 : avatarSize;
   const IMG_HEIGHT = avatarSize > 460 ? 460 : avatarSize;
   const MARGIN = 10;
@@ -60,13 +102,13 @@ function generateSvg(contributors, avatarSize = 60) {
         `;
     }),
   ).then((svgList) => {
-    const rows = Math.ceil(contributors.length / COLS_PER_ROW);
-    const width = COLS_PER_ROW * IMG_WIDTH + (COLS_PER_ROW + 1) * MARGIN;
+    const rows = Math.ceil(contributors.length / columns);
+    const width = columns * IMG_WIDTH + (columns + 1) * MARGIN;
     const height = rows * IMG_HEIGHT + (rows + 1) * MARGIN;
 
     svgList.forEach((userSvg, index) => {
-      const nextX = (index % COLS_PER_ROW) * (IMG_WIDTH + MARGIN);
-      const nextY = Math.floor(index / COLS_PER_ROW) * (IMG_HEIGHT + MARGIN);
+      const nextX = (index % columns) * (IMG_WIDTH + MARGIN);
+      const nextY = Math.floor(index / columns) * (IMG_HEIGHT + MARGIN);
       svg += userSvg.replace('nextX', nextX).replace('nextY', nextY);
     });
 
